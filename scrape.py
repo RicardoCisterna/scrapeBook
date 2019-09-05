@@ -12,20 +12,39 @@ from bs4 import BeautifulSoup
 import requests
 
 
-r = requests.get('http://books.toscrape.com/catalogue/category/books/politics_48/index.html')
+#clases
+class Category:
+    def __init__(self, name, link):
+        self.category = name
+        self.link = link
+#funciones
+#retorna lista de objeto Category        
+def getCategory(html):
+    soup = BeautifulSoup(html, 'html.parser')
+    categ=[]
+    for sibling in soup.html.body.aside.ul.li.ul.find_all('a'):
+        name = sibling.text.strip()
+        link = "http://books.toscrape.com/catalogue/category/books"#buscar mejor forma 
+        link=link + sibling['href'].replace('..','')
+        categ.append(Category(name,link))
+    return categ
+
+
+def getBook(html,category):
+    return 0
+
+r = requests.get('http://books.toscrape.com')
 html = r.text
+   
+aux = getCategory(html)
+for i in aux:
+    print (i.category)
+    print (i.link)
 
 
-soup = BeautifulSoup(html, 'html.parser')
-soup.tittle
-#aside = BeautifulSoup(soup.html.body.aside.ul.li.ul.li.a, 'html.parser')
 
-for sibling in soup.html.body.aside.ul.li.ul.find_all('a'):
-    #print(repr(sibling))
-    print( sibling['href'])
-    print (sibling.text.strip())
-    link = "http://books.toscrape.com/catalogue/category/books"#buscar mejor forma 
-    print (link + sibling['href'].replace('..',''))
+
+
 
 #print(soup.html.body.aside.ul.li.ul.li.a)
 
