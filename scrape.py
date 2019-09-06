@@ -14,9 +14,19 @@ import requests
 
 #clases
 class Category:
-    def __init__(self, name, link):
-        self.category = name
+    def __init__(self, name, link,image):
+        self.name = name
         self.link = link
+        
+
+class Book:
+    def __init__(self, name, link,category):
+        self.name = name
+        self.link = link
+        self.category = category
+        self.image =image
+    
+
 #funciones
 #retorna lista de objeto Category        
 def getCategory(html):
@@ -24,22 +34,63 @@ def getCategory(html):
     categ=[]
     for sibling in soup.html.body.aside.ul.li.ul.find_all('a'):
         name = sibling.text.strip()
-        link = "http://books.toscrape.com/catalogue/category/books"#buscar mejor forma 
+        link = "http://books.toscrape.com/"#buscar mejor forma 
         link=link + sibling['href'].replace('..','')
         categ.append(Category(name,link))
     return categ
 
 
-def getBook(html,category):
+
+
+
+def getBookLinkDetail(category):
+    r = requests.get(category.link)
+    html = r.text
+    soup = BeautifulSoup(html, 'html.parser')
+    details=[]
+    print (category.link)
+    for sibling in soup.html.body.find_all('article'): #find_all("div", {"class": "col-sm-8 col-md-9"}).article:  # .h3.find_all('a', href=True):
+        print(sibling.h3.a['href'].replace('../',''))
+        #name = sibling .h3.find_all('a', href=True).text.strip()
+        link = "http://books.toscrape.com/catalogue/"#buscar mejor forma 
+        link=link + sibling.h3.a['href'].replace('../','')
+        details.append(link)
+    return details
+
+def getBookDetail(link,category):
+    r = requests.get(category.link)
+    html = r.text
+    soup = BeautifulSoup(html, 'html.parser')
+    details=[]
+    print (category.link)
+    for sibling in soup.html.body.find_all('article'): #find_all("div", {"class": "col-sm-8 col-md-9"}).article:  # .h3.find_all('a', href=True):
+        print(sibling.h3.a['href'].replace('../',''))
+        #name = sibling .h3.find_all('a', href=True).text.strip()
+        link = "http://books.toscrape.com/catalogue/"#buscar mejor forma 
+        link=link + sibling.h3.a['href'].replace('../','')
+        details.appedn
+
+
     return 0
+
+
+
+
+a=Category('Treavel','http://books.toscrape.com/catalogue/category/books/travel_2/index.html')
+
+b = getBook(a)
+
 
 r = requests.get('http://books.toscrape.com')
 html = r.text
    
-aux = getCategory(html)
-for i in aux:
-    print (i.category)
-    print (i.link)
+categorys = getCategory(html)
+for category in categorys:
+    details = getBookLinkDetail(category)
+    for detail in details:
+        book = (detail,category)
+    
+    
 
 
 
