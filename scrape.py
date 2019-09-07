@@ -10,21 +10,32 @@
 
 from bs4 import BeautifulSoup
 import requests
+import re
 
 
 #clases
 class Category:
-    def __init__(self, name, link,image):
+    def __init__(self, name, link):
         self.name = name
         self.link = link
         
 
 class Book:
-    def __init__(self, name, link,category):
-        self.name = name
-        self.link = link
+    def __init__(self, title, price,stock,category,cover,upc,productType,priceWtax,priceWOtax,tax,
+                 avalilability,numberOfReviews):
+        self.title = title
+        self.price = price
+        self.stock = stock
         self.category = category
-        self.image =image
+        self.cover = cover
+        self.upc =upc
+        self.productType =productType
+        self.priceWtax =priceWtax
+        self.priceWOtax =priceWOtax
+        self.tax =tax
+        self.avalilability =avalilability
+        self.numberOfReviews =numberOfReviews
+
     
 
 #funciones
@@ -48,9 +59,7 @@ def getBookLinkDetail(category):
     html = r.text
     soup = BeautifulSoup(html, 'html.parser')
     details=[]
-    print (category.link)
     for sibling in soup.html.body.find_all('article'): #find_all("div", {"class": "col-sm-8 col-md-9"}).article:  # .h3.find_all('a', href=True):
-        print(sibling.h3.a['href'].replace('../',''))
         #name = sibling .h3.find_all('a', href=True).text.strip()
         link = "http://books.toscrape.com/catalogue/"#buscar mejor forma 
         link=link + sibling.h3.a['href'].replace('../','')
@@ -58,27 +67,35 @@ def getBookLinkDetail(category):
     return details
 
 def getBookDetail(link,category):
-    r = requests.get(category.link)
+    r = requests.get(link)
     html = r.text
+    
     soup = BeautifulSoup(html, 'html.parser')
-    details=[]
-    print (category.link)
-    for sibling in soup.html.body.find_all('article'): #find_all("div", {"class": "col-sm-8 col-md-9"}).article:  # .h3.find_all('a', href=True):
-        print(sibling.h3.a['href'].replace('../',''))
-        #name = sibling .h3.find_all('a', href=True).text.strip()
-        link = "http://books.toscrape.com/catalogue/"#buscar mejor forma 
-        link=link + sibling.h3.a['href'].replace('../','')
-        details.appedn
-
-
-    return 0
+    main = soup.html.body.article#.find_all('div',class_="row")
+    link = "http://books.toscrape.com/"#buscar mejor forma
+    cover=link + main.div.img['src'].replace('../','')#4
+    productMain = main.find_all('div',{"class": "product_main"})
+    title = productMain[0].h1.text
+    aux = productMain[0].find_all('p')
+    price = aux[0].text.replace('Â','')
+    stock = re.sub("\D", "", aux[1].text.strip())
+    table = main.table.find_all('td')
+    upc=table[0].text
+    productType=table[1].text
+    priceWtax =table[2].text.replace('Â','')
+    priceWOtax =table[3].text.replace('Â','')
+    tax =table[4].text.replace('Â','')
+    avalilability =table[5].text
+    numberOfReviews =table[6].text
+    book=Book(title,price,stock,category,cover,upc,productType,priceWtax,priceWOtax,tax,avalilability,numberOfReviews)
+    return book
 
 
 
 
 a=Category('Treavel','http://books.toscrape.com/catalogue/category/books/travel_2/index.html')
 
-b = getBook(a)
+
 
 
 r = requests.get('http://books.toscrape.com')
@@ -87,9 +104,12 @@ html = r.text
 categorys = getCategory(html)
 for category in categorys:
     details = getBookLinkDetail(category)
+   
     for detail in details:
-        book = (detail,category)
-    
+        
+        book = getBookDetail(detail,category.name)
+        break
+    break
     
 
 
