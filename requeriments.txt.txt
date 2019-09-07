@@ -1,0 +1,10 @@
+programa esta desarrollado con python 3.7
+se tienen que instalar las librerias Requests y Beautiful Soup para python 3.7
+
+el programa tiene 3 archivos.
+
+clases.py
+function.py
+scrape.py
+
+para ejecutar el programa es necesario correr scrape.py
